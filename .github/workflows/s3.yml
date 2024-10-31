@@ -26,7 +26,7 @@ jobs:
       tags_array: ${{ steps.get-tags.outputs.tags_array }}
     steps:
       - name: get s3 bucket list
-        id: s3 list
+        id: s3-list
         run: |
           echo "Testing AWS credentials by listing S3 buckets..."
           aws s3 ls || echo "AWS credentials validation failed."
