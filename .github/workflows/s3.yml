@@ -24,10 +24,11 @@ jobs:
     needs: [ AWS-Login ]
     runs-on: ubuntu-latest
     steps:
+      - name: Verify AWS credentials
+        run: |
+          aws sts get-caller-identity || echo "AWS credentials validation failed."
+      
       - name: List S3 buckets
-        id: s3-list
-        env:
-          AWS_PROFILE: default  # Set AWS_PROFILE to use the default profile
         run: |
           echo "Testing AWS credentials by listing S3 buckets..."
           bucket_list=$(aws s3 ls)
