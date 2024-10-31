@@ -3,21 +3,30 @@
 name: Validate AWS Credentials
 
 on:
-  workflow_dispatch:  # Allows manual triggering of the workflow
-    inputs:
-      environment:
-        description: "Choose the environment to run in"
-        required: true
-        default: "TEST"  # Change to your default environment if needed
+  workflow_dispatch:
 
 jobs:
   validate-credentials:
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
-    
+
     steps:
       - name: Check out the repository
         uses: actions/checkout@v3
+
+      - name: Verify AWS CLI installation
+        run: |
+          if ! command -v aws &> /dev/null; then
+            echo "AWS CLI is not installed."
+            exit 1
+          else
+            echo "AWS CLI is installed."
+          fi
+
+      - name: Set environment variables
+        run: |
+          echo "Setting environment to TEST and region to eu-central-1"
+          echo "ENV=TEST" >> $GITHUB_ENV
+          echo "AWS_DEFAULT_REGION=eu-central-1" >> $GITHUB_ENV
 
       - name: Create AWS config directory
         run: mkdir -p ~/.aws
@@ -31,7 +40,13 @@ jobs:
           echo "aws_access_key_id=${AWS_ACCESS_KEY_ID}" >> ~/.aws/credentials
           echo "aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}" >> ~/.aws/credentials
 
+      - name: Configure AWS region
+        run: |
+          echo "[default]" > ~/.aws/config
+          echo "region = eu-central-1" >> ~/.aws/config
+
       - name: Validate AWS credentials
         run: |
           echo "Testing AWS credentials by listing S3 buckets..."
+          aws sts get-caller-identity || echo "AWS credentials validation failed."
           aws s3 ls || echo "AWS credentials validation failed."
