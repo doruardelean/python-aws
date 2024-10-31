@@ -1,4 +1,4 @@
-name: S3 list
+name: S3 List
 
 on:
   workflow_dispatch:
@@ -25,6 +25,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: List S3 buckets
+        id: s3-list
         run: |
           echo "Testing AWS credentials by listing S3 buckets..."
-          aws s3 ls || echo "AWS credentials validation failed."
+          bucket_list=$(aws s3 ls)
+          if [ -z "$bucket_list" ]; then
+            echo "No S3 buckets found or credentials validation failed."
+          else
+            echo "S3 buckets:"
+            echo "$bucket_list"
+          fi
