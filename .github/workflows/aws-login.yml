@@ -8,10 +8,6 @@ on:
       AWS_SECRET_ACCESS_KEY:
         description: 'AWS Access Key'
         required: true
-    outputs:
-      token:
-        description: Old Version
-        value: ${{ jobs.AWS-Login.outputs.token }}
 jobs:
   AWS-Login:
     runs-on: ubuntu-latest
@@ -23,8 +19,3 @@ jobs:
           aws-region: eu-central-1
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: Get token
-        id: get-token
-        run: |
-          token=$(aws ecr get-login-password --region eu-central-1)
-          echo "value=$token" >> "$GITHUB_OUTPUT"
