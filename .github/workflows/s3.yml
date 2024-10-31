@@ -6,10 +6,16 @@ env:
   AWS_REGION: eu-central-1
 
 jobs:
-  Setup:
+  S3_bucket_list:
     runs-on: ubuntu-latest
     environment: TEST  # Specify the environment to access environment secrets
     steps:
+      - name: Debug Environment Variables
+        run: |
+          echo "AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}"
+          echo "AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}"
+        shell: bash
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
