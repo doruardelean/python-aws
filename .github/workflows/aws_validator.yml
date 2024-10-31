@@ -1,0 +1,28 @@
+# .github/workflows/validate-aws-credentials.yml
+
+name: Validate AWS Credentials
+
+on:
+  workflow_dispatch:  # Allows manual triggering of the workflow
+    inputs:
+      environment:
+        description: "Choose the environment to run in"
+        required: true
+        default: "TEST"  # Change to your default environment if needed
+
+jobs:
+  validate-credentials:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3
+
+      - name: Validate AWS credentials
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          echo "Testing AWS credentials by listing S3 buckets..."
+          aws s3 ls || echo "AWS credentials validation failed."
