@@ -26,24 +26,21 @@ jobs:
           echo "ENV=TEST" >> $GITHUB_ENV
           echo "AWS_DEFAULT_REGION=eu-central-1" >> $GITHUB_ENV
 
-      - name: Verify AWS secrets are set
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: |
-          if [[ -z "$AWS_ACCESS_KEY_ID" || -z "$AWS_SECRET_ACCESS_KEY" ]]; then
-            echo "AWS secrets are missing or empty."
-            exit 1
-          else
-            echo "AWS secrets are set."
-          fi
-
       - name: Configure AWS credentials and get token
         uses: aws-actions/configure-aws-credentials@master
         with:
           aws-region: eu-central-1
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Verify AWS secrets are set
+        run: |
+          if [[ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" || -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]]; then
+            echo "AWS secrets are missing or empty."
+            exit 1
+          else
+            echo "AWS secrets are set."
+          fi
 
       - name: Get ECR login token
         id: get-token
