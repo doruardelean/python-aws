@@ -2,26 +2,19 @@ name: S3 List
 
 on:
   workflow_dispatch:
-    secrets:
-      AWS_ACCESS_KEY_ID:
-        description: 'AWS Access Key'
-        required: true
-      AWS_SECRET_ACCESS_KEY:
-        description: 'AWS Secret Access Key'
-        required: true
-
 env:
   AWS_REGION: eu-central-1
 
 jobs:
   Setup:
     runs-on: ubuntu-latest
+    environment: TEST  # Specify the environment to access environment secrets
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}  # Access the environment secret
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # Access the environment secret
           aws-region: eu-central-1
 
       - name: Verify AWS credentials
