@@ -1,0 +1,32 @@
+name: S3 list
+
+on:
+  workflow_dispatch:
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        description: 'AWS Access Key'
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        description: 'AWS Secret Access Key'
+        required: true
+env:
+  AWS_USERNAME: AWS
+  AWS_REGION: eu-central-1
+
+jobs:
+  AWS-Login:
+    uses: doruardelean/python-aws/.github/workflows/aws-login.yml@main
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  Setup:
+    needs: [ AWS-Login ]
+    runs-on: ubuntu:latest
+    outputs:
+      tags_array: ${{ steps.get-tags.outputs.tags_array }}
+    steps:
+      - name: get s3 bucket list
+        id: s3 list
+        run: |
+          echo "Testing AWS credentials by listing S3 buckets..."
+          aws s3 ls || echo "AWS credentials validation failed."
