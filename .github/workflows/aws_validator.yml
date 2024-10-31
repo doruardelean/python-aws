@@ -8,7 +8,7 @@ on:
       environment:
         description: "Choose the environment to run in"
         required: true
-        default: "prod"  # Change to your default environment if needed
+        default: "TEST"  # Change to your default environment if needed
 
 jobs:
   validate-credentials:
@@ -18,6 +18,9 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v3
+
+      - name: Create AWS config directory
+        run: mkdir -p ~/.aws
 
       - name: Configure AWS credentials
         env:
