@@ -1,4 +1,4 @@
-name: Validate AWS Credentials
+name: Validate AWS Credentials with Token
 
 on:
   workflow_dispatch:
@@ -38,20 +38,28 @@ jobs:
             echo "AWS secrets are set."
           fi
 
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials and get token
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          aws-region: eu-central-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Get ECR login token
+        id: get-token
+        run: |
+          token=$(aws ecr get-login-password --region eu-central-1)
+          echo "value=$token" >> "$GITHUB_OUTPUT"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: |
-          mkdir -p ~/.aws
-          echo "[default]" > ~/.aws/credentials
-          echo "aws_access_key_id=${AWS_ACCESS_KEY_ID}" >> ~/.aws/credentials
-          echo "aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}" >> ~/.aws/credentials
-          echo "[default]" > ~/.aws/config
-          echo "region = eu-central-1" >> ~/.aws/config
 
-      - name: Validate AWS credentials
+      - name: Validate AWS credentials with token
         run: |
-          echo "Testing AWS credentials by listing S3 buckets..."
+          echo "Testing AWS credentials and token by listing S3 buckets..."
           aws sts get-caller-identity || echo "AWS credentials validation failed."
           aws s3 ls || echo "AWS credentials validation failed."
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ steps.get-token.outputs.value }}
